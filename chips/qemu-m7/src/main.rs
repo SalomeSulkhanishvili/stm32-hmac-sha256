@@ -3,10 +3,11 @@
 
 use cortex_m_rt::entry;
 use defmt::info;
-use {defmt_rtt as _, panic_probe as _};
+use {defmt_semihosting as _, panic_semihosting as _};
 
 use heapless::Vec;
-use stm32_hmac_sha256::mavlink::{MavLinkFrame, MavLinkState, sign_frame, verify_frame, crc_extra_for};
+use mavlink::mavlink::{MavLinkFrame, MavLinkState, sign_frame, verify_frame, crc_extra_for};
+
 
 #[entry]
 fn main() -> ! {

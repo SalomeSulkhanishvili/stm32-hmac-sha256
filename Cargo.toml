@@ -1,30 +1,10 @@
-[package]
-name = "stm32-hmac-sha256"
-version = "0.1.0"
-edition = "2024"
-
-[dependencies]
-
-defmt = "1.0.1"
-defmt-rtt = "1.0.0"
-cortex-m = { version = "0.7.6", features = ["critical-section-single-core"] }
-cortex-m-rt = "0.7.0"
-embedded-hal = "1.0.0"
-panic-probe = { version = "1.0.0", features = ["print-defmt"] }
-heapless = { version = "0.9", default-features = false }
-hmac = { version = "0.13", default-features = false }
-sha2 = { version = "0.11", default-features = false }
-subtle = { version = "2", default-features = false }
-critical-section = "1.0"
-
-# [dev-dependencies]
-# defmt-test = "0.4"
-
+[workspace]
+members = ["mavlink", "chips/stm32c092rc", "chips/stm32f767zi", "chips/qemu-m7"]
+resolver = "2"
 
 [profile.dev]
 panic = "abort"
 
-# For development (keep debug info)
 [profile.release]
 debug = 2
 opt-level = "s"
@@ -32,10 +12,8 @@ lto = true
 codegen-units = 1
 panic = "abort"
 
-# For final deployment (strip everything)
 [profile.release-deploy]
 inherits = "release"
 debug = false
 strip = true
 opt-level = "z"
-

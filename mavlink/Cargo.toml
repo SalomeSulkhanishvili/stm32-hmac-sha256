@@ -1,0 +1,12 @@
+[package]
+name = "mavlink"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+defmt = "1.0.1"
+heapless = { version = "0.9", default-features = false }
+hmac = { version = "0.13", default-features = false }
+sha2 = { version = "0.11", default-features = false }
+subtle = { version = "2", default-features = false }
+critical-section = "1.0"
