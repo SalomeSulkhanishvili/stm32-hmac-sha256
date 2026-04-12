@@ -6,8 +6,7 @@ pub fn crc_extra_for(msg_id: [u8; 3]) -> Option<u8> {
         [0, 0, 0]   => Some(50),  // HEARTBEAT
         [1, 0, 0]   => Some(124), // SYS_STATUS
         [2, 0, 0]   => Some(137), // SYSTEM_TIME
-        [3, 0, 0]   => Some(237), // PING
-        [4, 0, 0]   => Some(237), // MOTOR_STATUS
+        [4, 0, 0]   => Some(237), // PING
         _           => None,
     }
 }
