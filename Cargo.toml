@@ -1,5 +1,5 @@
 [workspace]
-members = ["mavlink", "chips/stm32c092rc", "chips/stm32f767zi", "chips/qemu-m7"]
+members = ["mavlink", "chips/stm32c092rc", "chips/qemu-m7"]
 resolver = "2"
 
 [profile.dev]
