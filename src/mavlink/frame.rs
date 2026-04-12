@@ -1,6 +1,7 @@
 use heapless::Vec;
 
 use super::constants::*;
+use super::checksum::*;
 
 pub struct MavLinkFrame {
     // Header fields
@@ -54,6 +55,25 @@ impl MavLinkFrame {
             timestamp,
             signature: [0; SIGNATURE_FIELD_SIZE], // Placeholder, set after signing
         }
+    }
+
+    pub fn compute_checksum(&self, crc_extra: u8) -> [u8; CHECKSUM_SIZE] {
+        let mut crc: u16 = 0xFFFF;
+        for &b in &[self.len, self.inc_flags, self.cmp_flags, self.seq, self.sys_id, self.comp_id] {
+            crc = crc_accumulate(b, crc);
+        }
+        for &b in &self.msg_id {
+            crc = crc_accumulate(b, crc);
+        }
+        for &b in self.payload.iter() {
+            crc = crc_accumulate(b, crc);
+        }
+        crc = crc_accumulate(crc_extra, crc);
+        [(crc & 0xFF) as u8, (crc >> 8) as u8]
+    }
+
+    pub fn set_checksum(&mut self, crc_extra: u8) {
+        self.checksum = self.compute_checksum(crc_extra);
     }
 
     // Method to parse a MAVLink frame from raw bytes

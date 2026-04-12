@@ -14,6 +14,8 @@ panic-probe = { version = "1.0.0", features = ["print-defmt"] }
 heapless = { version = "0.9", default-features = false }
 hmac = { version = "0.13", default-features = false }
 sha2 = { version = "0.11", default-features = false }
+subtle = { version = "2", default-features = false }
+critical-section = "1.0"
 
 # [dev-dependencies]
 # defmt-test = "0.4"
