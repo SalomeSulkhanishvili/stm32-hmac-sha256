@@ -2,7 +2,13 @@
 target = "thumbv6m-none-eabi"
 
 [target.thumbv6m-none-eabi]
-runner = "probe-rs run --chip STM32C011F6"
+runner = "probe-rs run --chip STM32C092RC"
 
 [env]
 DEFMT_LOG = "trace"
+
+
+# Notes:
+# cargo size --profile release-deploy -- -A
+# cargo size --profile release -- -A
+# cargo size --profile dev -- -A
