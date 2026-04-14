@@ -2,7 +2,7 @@ use heapless::Vec;
 
 use crate::mavlink::{
     sign_frame, verify_frame, MavLinkFrame, MavLinkState, SignError, VerifyError,
-    MAX_PAYLOAD_SIZE, SIGNED_FLAG,
+    MAX_PAYLOAD_SIZE,
 };
 
 // 32-byte key used across tests (same as the demo in main.rs)
@@ -36,9 +36,9 @@ fn test_sign_and_verify_valid() {
 
     sign_frame(&mut frame, KEY).unwrap();
 
-    assert!(frame.inc_flags & SIGNED_FLAG != 0);
+    assert!(frame.is_signed());
     assert_eq!(verify_frame(&frame, KEY, &CURRENT_TS, &mut state), Ok(()));
-    assert_eq!(state.last_accepted_timestamp, frame.timestamp);
+    assert_eq!(*state.last_accepted_timestamp(), frame.timestamp);
 }
 
 // --- key errors ---
@@ -75,7 +75,7 @@ fn test_wrong_key_fails() {
         Err(VerifyError::HmacMismatch),
     );
     // state must NOT advance on failure
-    assert_eq!(state.last_accepted_timestamp, [0u8; 6]);
+    assert_eq!(*state.last_accepted_timestamp(), [0u8; 6]);
 }
 
 #[test]
@@ -127,7 +127,7 @@ fn test_tampered_signature_fails() {
     let mut state = MavLinkState::new(0);
 
     sign_frame(&mut frame, KEY).unwrap();
-    frame.signature[0] ^= 0xFF; // CRC unaffected; HMAC check catches this
+    frame.signature_mut()[0] ^= 0xFF; // CRC unaffected; HMAC check catches this
 
     assert_eq!(
         verify_frame(&frame, KEY, &CURRENT_TS, &mut state),

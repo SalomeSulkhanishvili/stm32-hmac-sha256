@@ -2,8 +2,8 @@
 use super::constants::TIMESTAMP_SIZE;
 
 pub struct MavLinkState {
-    pub last_accepted_timestamp: [u8; TIMESTAMP_SIZE],
-    pub expected_link_id: u8,
+    last_accepted_timestamp: [u8; TIMESTAMP_SIZE],
+    pub(crate) expected_link_id: u8,
 }
 
 
@@ -15,7 +15,11 @@ impl MavLinkState {
         }
     }
 
-    pub fn update_timestamp(&mut self, timestamp: [u8; TIMESTAMP_SIZE]) {
+    pub fn last_accepted_timestamp(&self) -> &[u8; TIMESTAMP_SIZE] {
+        &self.last_accepted_timestamp
+    }
+
+    pub(crate) fn update_timestamp(&mut self, timestamp: [u8; TIMESTAMP_SIZE]) {
         self.last_accepted_timestamp = timestamp;
     }
 }

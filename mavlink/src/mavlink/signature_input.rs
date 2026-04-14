@@ -23,7 +23,7 @@ pub(crate) fn timestamp_to_u64(ts: &[u8; TIMESTAMP_SIZE]) -> u64 {
 //
 // Using mac.update() multiple times is identical to feeding all bytes at once;
 // HMAC processes input in a streaming fashion internally.
-pub fn feed_signing_bytes(mac: &mut HmacSha256, frame: &MavLinkFrame) {
+pub(crate) fn feed_signing_bytes(mac: &mut HmacSha256, frame: &MavLinkFrame) {
 
     // Header fields in wire order
     mac.update(&[

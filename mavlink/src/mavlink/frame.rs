@@ -5,45 +5,45 @@ use super::checksum::*;
 
 pub struct MavLinkFrame {
     // Header fields
-    pub stx: u8,
-    pub len: u8,
-    pub inc_flags: u8,
-    pub cmp_flags: u8,
-    pub seq: u8,
-    pub sys_id: u8,
-    pub comp_id: u8,
+    pub(crate) stx: u8,
+    pub(crate) len: u8,
+    pub(crate) inc_flags: u8,
+    pub(crate) cmp_flags: u8,
+    pub(crate) seq: u8,
+    pub(crate) sys_id: u8,
+    pub(crate) comp_id: u8,
     pub msg_id: [u8; 3],
 
     // Payload
     pub payload: Vec<u8, MAX_PAYLOAD_SIZE>,
 
     // Checksum
-    pub checksum: [u8; CHECKSUM_SIZE],
+    pub(crate) checksum: [u8; CHECKSUM_SIZE],
 
     // Signature
-    pub link_id: u8,
+    pub(crate) link_id: u8,
     pub timestamp: [u8; TIMESTAMP_SIZE],
-    pub signature: [u8; SIGNATURE_FIELD_SIZE],
+    pub(crate) signature: [u8; SIGNATURE_FIELD_SIZE],
 }
 
 
 impl MavLinkFrame {
     // Constructor for creating a new MAVLink frame
     pub fn new(
-        cmp_flags: u8, 
-        seq: u8, 
-        sys_id: u8, 
-        comp_id: u8, 
+        cmp_flags: u8,
+        seq: u8,
+        sys_id: u8,
+        comp_id: u8,
         msg_id: [u8; 3],
         payload: Vec<u8, MAX_PAYLOAD_SIZE>,
         checksum: [u8; CHECKSUM_SIZE],
         link_id: u8,
-        timestamp: [u8; TIMESTAMP_SIZE],    
+        timestamp: [u8; TIMESTAMP_SIZE],
     ) -> Self {
         MavLinkFrame {
             stx: 0xFD, // Start of Frame
             len: payload.len() as u8,
-            inc_flags: 0, // 0 => normal packer, 1 => include signature
+            inc_flags: 0, // 0 => normal packet, 1 => include signature
             cmp_flags,
             seq,
             sys_id,
@@ -57,7 +57,15 @@ impl MavLinkFrame {
         }
     }
 
-    pub fn compute_checksum(&self, crc_extra: u8) -> [u8; CHECKSUM_SIZE] {
+    pub fn is_signed(&self) -> bool {
+        (self.inc_flags & SIGNED_FLAG) != 0
+    }
+
+    pub fn signature_mut(&mut self) -> &mut [u8; SIGNATURE_FIELD_SIZE] {
+        &mut self.signature
+    }
+
+    pub(crate) fn compute_checksum(&self, crc_extra: u8) -> [u8; CHECKSUM_SIZE] {
         let mut crc: u16 = 0xFFFF;
         for &b in &[self.len, self.inc_flags, self.cmp_flags, self.seq, self.sys_id, self.comp_id] {
             crc = crc_accumulate(b, crc);
@@ -72,7 +80,7 @@ impl MavLinkFrame {
         [(crc & 0xFF) as u8, (crc >> 8) as u8]
     }
 
-    pub fn set_checksum(&mut self, crc_extra: u8) {
+    pub(crate) fn set_checksum(&mut self, crc_extra: u8) {
         self.checksum = self.compute_checksum(crc_extra);
     }
 
@@ -114,7 +122,7 @@ impl MavLinkFrame {
             payload,
             checksum: [bytes[HEADER_SIZE + len], bytes[HEADER_SIZE + len + 1]],
             link_id: if has_sig { bytes[HEADER_SIZE + len + CHECKSUM_SIZE] } else { 0 },
-            timestamp: if has_sig { 
+            timestamp: if has_sig {
                 let mut ts = [0; TIMESTAMP_SIZE];
                 ts.copy_from_slice(&bytes[HEADER_SIZE + len + CHECKSUM_SIZE + LINK_ID_SIZE..HEADER_SIZE + len + CHECKSUM_SIZE + LINK_ID_SIZE + TIMESTAMP_SIZE]);
                 ts
@@ -149,7 +157,7 @@ impl MavLinkFrame {
         bytes.extend_from_slice(&self.checksum).ok();
 
         // Signature (if included)
-        if (self.inc_flags & SIGNED_FLAG) != 0 {
+        if self.is_signed() {
             bytes.push(self.link_id).ok();
             bytes.extend_from_slice(&self.timestamp).ok();
             bytes.extend_from_slice(&self.signature).ok();

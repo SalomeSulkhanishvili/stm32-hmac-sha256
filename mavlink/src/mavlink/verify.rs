@@ -18,7 +18,7 @@ pub fn verify_frame(
     state: &mut MavLinkState,
 ) -> Result<(), VerifyError> {
 
-    if (frame.inc_flags & SIGNED_FLAG) == 0 {
+    if !frame.is_signed() {
         return Err(VerifyError::NotSigned);
     }
 
@@ -59,7 +59,7 @@ pub fn verify_frame(
     }
 
     critical_section::with(|_| {
-        let last_ts = timestamp_to_u64(&state.last_accepted_timestamp);
+        let last_ts = timestamp_to_u64(state.last_accepted_timestamp());
         if frame_ts <= last_ts {
             return Err(VerifyError::Replay);
         }
