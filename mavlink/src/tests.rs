@@ -8,10 +8,10 @@ use crate::mavlink::{
 // 32-byte key used across tests (same as the demo in main.rs)
 const KEY: &[u8; 32] = b"\xaa\x53\x4a\x45\x7a\xb5\xe0\x43\x53\x0f\x82\xaa\x5c\x20\xf8\xd9\xd6\x71\xdd\xa7\x84\xaf\x5c\x40\x93\x1e\x70\x65\x58\x40\xfe\x67";
 
-// Same length as KEY but different first byte — triggers HmacMismatch, not InvalidKey
+// Same length as KEY but different first byte (triggers HmacMismatch, not InvalidKey)
 const WRONG_KEY: &[u8; 32] = b"\xbb\x53\x4a\x45\x7a\xb5\xe0\x43\x53\x0f\x82\xaa\x5c\x20\xf8\xd9\xd6\x71\xdd\xa7\x84\xaf\x5c\x40\x93\x1e\x70\x65\x58\x40\xfe\x67";
 
-const MSG_ID: [u8; 3] = [0x00, 0x00, 0x00]; // HEARTBEAT
+const MSG_ID: [u8; 3] = [0x00, 0x00, 0x00]; // HEARTBEAT (check the mavlink/src/mavlink/checksum.rs for CRC extra value)
 const CURRENT_TS: [u8; 6] = [20, 0, 0, 0, 0, 0]; // current time = 20 units
 
 fn make_frame(timestamp: [u8; 6]) -> MavLinkFrame {
