@@ -3,6 +3,9 @@ name = "mavlink"
 version = "0.1.0"
 edition = "2024"
 
+[dev-dependencies]
+critical-section = { version = "1.0", features = ["std"] }
+
 [dependencies]
 defmt = "1.0.1"
 heapless = { version = "0.9", default-features = false }

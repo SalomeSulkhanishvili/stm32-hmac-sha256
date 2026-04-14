@@ -8,6 +8,7 @@ pub fn crc_extra_for(msg_id: [u8; 3]) -> Option<u8> {
         [2, 0, 0]   => Some(137), // SYSTEM_TIME
         [4, 0, 0]   => Some(237), // PING
         _           => None,
+        // NOTE: in actual implementation, this would be a large static lookup table covering all known msg_ids
     }
 }
 

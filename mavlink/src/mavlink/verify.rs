@@ -1,6 +1,7 @@
 use hmac::{KeyInit, Mac};
 use subtle::ConstantTimeEq;
 
+use super::checksum::crc_extra_for;
 use super::frame::MavLinkFrame;
 use super::state::MavLinkState;
 use super::constants::*;
@@ -15,7 +16,6 @@ pub fn verify_frame(
     secret_key: &[u8],
     current_timestamp: &[u8; TIMESTAMP_SIZE],
     state: &mut MavLinkState,
-    crc_extra: u8,
 ) -> Result<(), VerifyError> {
 
     if (frame.inc_flags & SIGNED_FLAG) == 0 {
@@ -29,6 +29,8 @@ pub fn verify_frame(
     if secret_key.len() != 32 {
         return Err(VerifyError::InvalidKey);
     }
+
+    let crc_extra = crc_extra_for(frame.msg_id).ok_or(VerifyError::UnknownMessage)?;
 
     if frame.checksum != frame.compute_checksum(crc_extra) {
         return Err(VerifyError::ChecksumMismatch);

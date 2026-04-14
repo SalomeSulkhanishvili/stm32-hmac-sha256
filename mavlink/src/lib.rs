@@ -1,3 +1,6 @@
-#![no_std]
+#![cfg_attr(not(test), no_std)]
 
 pub mod mavlink;
+
+#[cfg(test)]
+mod tests;

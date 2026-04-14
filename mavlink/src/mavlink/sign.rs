@@ -1,12 +1,18 @@
 use hmac::{KeyInit, Mac};
 
+use super::checksum::crc_extra_for;
 use super::constants::*;
+use super::errors::SignError;
 use super::frame::MavLinkFrame;
 use super::signature_input::{feed_signing_bytes, HmacSha256};
 
 
-pub fn sign_frame(frame: &mut MavLinkFrame, secret_key: &[u8], crc_extra: u8) {
-    debug_assert!(secret_key.len() == 32, "Secret key must be 32 bytes");
+pub fn sign_frame(frame: &mut MavLinkFrame, secret_key: &[u8]) -> Result<(), SignError> {
+    if secret_key.len() != 32 {
+        return Err(SignError::InvalidKey);
+    }
+
+    let crc_extra = crc_extra_for(frame.msg_id).ok_or(SignError::UnknownMessage)?;
 
     frame.inc_flags |= SIGNED_FLAG;
     frame.set_checksum(crc_extra);
@@ -17,4 +23,6 @@ pub fn sign_frame(frame: &mut MavLinkFrame, secret_key: &[u8], crc_extra: u8) {
 
     let full_signature = mac.finalize().into_bytes();
     frame.signature.copy_from_slice(&full_signature[..SIGNATURE_FIELD_SIZE]);
+
+    Ok(())
 }
