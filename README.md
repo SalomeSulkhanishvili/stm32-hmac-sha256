@@ -1,4 +1,4 @@
-# Part A - Rust Implementation: HMAC-SHA256 on STM32
+# Rust Implementation: HMAC-SHA256 on STM32
 
 Minimal `no_std` Rust implementation that **signs and verifies MAVLink v2 messages using HMAC-SHA256**, targeting both a QEMU-simulated Cortex-M7 and a real STM32 board. 
 
@@ -52,8 +52,6 @@ Target triple: `thumbv7em-none-eabihf`
 cd chips/qemu-m7
 cargo run --release
 ```
-
-> **Note on STM32F7:** VectraSwarm's website lists the STM32F7 series as a target MCU. The signing library itself is architecture-agnostic - only the `chips/` runner crate changes between targets. The QEMU target uses a Cortex-M7 (`thumbv7em-none-eabihf`), which is binary-compatible with the STM32F7 family. Running the QEMU target therefore validates the exact instruction set that would execute on an STM32F7 device.
 
 ### STM32C092RC (real hardware)
 
